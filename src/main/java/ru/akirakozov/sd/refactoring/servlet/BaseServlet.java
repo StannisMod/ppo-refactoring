@@ -30,6 +30,30 @@ public abstract class BaseServlet extends HttpServlet {
         });
     }
 
+    protected void listProducts(ResultSet rs, PrintWriter writer) throws SQLException {
+        while (rs.next()) {
+            String name = rs.getString("name");
+            int price = rs.getInt("price");
+            writer.println(name + "\t" + price + "</br>");
+        }
+    }
+
+    protected void printListProducts(HttpServletResponse response, String sql, String header) {
+        formResponse(response, sql, (r, writer, rs) -> {
+            writer.println("<h1>" + header + "</h1>");
+            listProducts(rs, writer);
+        });
+    }
+
+    protected void printNumber(HttpServletResponse response, String sql, String header) {
+        formResponse(response, sql, (r, writer, rs) -> {
+            writer.println("<h1>" + header + "</h1>");
+            if (rs.next()) {
+                writer.println(rs.getInt(1));
+            }
+        });
+    }
+
     protected interface ResponseFormer {
         void form(HttpServletResponse response, PrintWriter writer, ResultSet rs) throws SQLException, IOException;
     }
