@@ -25,9 +25,11 @@ public class Main {
         context.setContextPath("/");
         server.setHandler(context);
 
-        addServlet(context, new AddProductServlet(), "add-product");
-        addServlet(context, new GetProductsServlet(), "get-products");
-        addServlet(context, new QueryServlet(), "query");
+        DbDriver db = new DbDriver("jdbc:sqlite:test.db");
+
+        addServlet(context, new AddProductServlet(db), "add-product");
+        addServlet(context, new GetProductsServlet(db), "get-products");
+        addServlet(context, new QueryServlet(db), "query");
 
         server.start();
         server.join();

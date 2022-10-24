@@ -1,35 +1,53 @@
 package ru.akirakozov.sd.refactoring;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.IOException;
+import java.sql.*;
 
 public class DbDriver {
 
-    private String dbAddress;
+    private final String dbAddress;
 
     public DbDriver(String pathToDb) {
-        try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db")) {
+        this.dbAddress = pathToDb;
+        runSQL(stmt -> {
             String sql = "CREATE TABLE IF NOT EXISTS PRODUCT" +
                     "(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                     " NAME           TEXT    NOT NULL, " +
                     " PRICE          INT     NOT NULL)";
-            Statement stmt = c.createStatement();
-
             stmt.executeUpdate(sql);
-            stmt.close();
-        } catch (SQLException e) {
-            // TODO
-            e.printStackTrace();
+            return null;
+        });
+    }
+
+    public void executeUpdate(String query) {
+        runSQL(stmt -> {
+            stmt.executeUpdate(query);
+            return null;
+        });
+    }
+
+    public void executeGet(String query, ResultSetHandler handler) {
+        try {
+            handler.run(runSQL(stmt -> stmt.executeQuery(query)));
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public void executeQuery() {
-
+    private ResultSet runSQL(SQLRunnable runnable) {
+        try (Connection c = DriverManager.getConnection(dbAddress);
+             Statement stmt = c.createStatement()) {
+            return runnable.run(stmt);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void executeGet() {
+    private interface SQLRunnable {
+        ResultSet run(Statement stmt) throws SQLException;
+    }
 
+    public interface ResultSetHandler {
+        void run(ResultSet rs) throws SQLException, IOException;
     }
 }
