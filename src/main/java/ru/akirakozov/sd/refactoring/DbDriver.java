@@ -9,36 +9,33 @@ public class DbDriver {
 
     public DbDriver(String pathToDb) {
         this.dbAddress = pathToDb;
-        runSQL(stmt -> {
-            String sql = "CREATE TABLE IF NOT EXISTS PRODUCT" +
+        executeUpdate(
+                "CREATE TABLE IF NOT EXISTS PRODUCT" +
                     "(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                     " NAME           TEXT    NOT NULL, " +
-                    " PRICE          INT     NOT NULL)";
-            stmt.executeUpdate(sql);
-            return null;
-        });
+                    " PRICE          INT     NOT NULL)"
+        );
     }
 
     public void executeUpdate(String query) {
-        runSQL(stmt -> {
+        runSQL(null, stmt -> {
             stmt.executeUpdate(query);
             return null;
         });
     }
 
     public void executeGet(String query, ResultSetHandler handler) {
-        try {
-            handler.run(runSQL(stmt -> stmt.executeQuery(query)));
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e);
-        }
+        runSQL(handler, stmt -> stmt.executeQuery(query));
     }
 
-    private ResultSet runSQL(SQLRunnable runnable) {
+    private void runSQL(ResultSetHandler handler, SQLRunnable runnable) {
         try (Connection c = DriverManager.getConnection(dbAddress);
-             Statement stmt = c.createStatement()) {
-            return runnable.run(stmt);
-        } catch (SQLException e) {
+            Statement stmt = c.createStatement()) {
+            ResultSet rs = runnable.run(stmt);
+            if (handler != null) {
+                handler.run(rs);
+            }
+        } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
     }
