@@ -13,25 +13,29 @@ import java.util.stream.Collectors;
 
 public class DbDriverTest {
 
-    @BeforeEach
-    public void prepareDB() {
-        try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db");
+    public static void prepareTestDB() {
+        try (Connection c = DriverManager.getConnection(Main.DB_PATH);
              Statement stmt = c.createStatement()) {
             stmt.executeUpdate("DROP TABLE IF EXISTS PRODUCT;");
             stmt.executeUpdate("CREATE TABLE PRODUCT (" +
-                                        "name VARCHAR(50), " +
-                                        "price INT" +
-                                   ");");
+                    "name VARCHAR(50), " +
+                    "price INT" +
+                    ");");
             stmt.executeUpdate("INSERT INTO PRODUCT (name, price) VALUES " +
-                                    "('apple', 1), ('coffee', 10), ('computer', 100);");
+                    "('apple', 1), ('coffee', 10), ('computer', 100);");
         } catch (SQLException e) {
             throw new RuntimeException("Error while creating test DB!!!", e);
         }
     }
 
+    @BeforeEach
+    public void prepareDB() {
+        prepareTestDB();
+    }
+
     @Test
     public void testExecuteGet() {
-        DbDriver driver = new DbDriver("jdbc:sqlite:test.db");
+        DbDriver driver = new DbDriver(Main.DB_PATH);
         int[] counter = new int[1];
 
         driver.executeGet("SELECT * FROM PRODUCT", rs -> {
@@ -47,7 +51,7 @@ public class DbDriverTest {
 
     @Test
     public void testExecuteModify() {
-        DbDriver driver = new DbDriver("jdbc:sqlite:test.db");
+        DbDriver driver = new DbDriver(Main.DB_PATH);
 
         driver.executeUpdate("INSERT INTO PRODUCT (name, price) VALUES ('monitor', 1100);");
 

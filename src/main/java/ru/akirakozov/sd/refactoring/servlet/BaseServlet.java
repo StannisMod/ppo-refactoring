@@ -25,7 +25,7 @@ public abstract class BaseServlet extends HttpServlet {
         getDb().executeGet(getQuery, rs -> {
             PrintWriter rWriter = response.getWriter();
             rWriter.println("<html><body>");
-            former.form(response, rWriter, rs);
+            former.form(rWriter, rs);
             rWriter.println("</body></html>");
         });
     }
@@ -39,14 +39,14 @@ public abstract class BaseServlet extends HttpServlet {
     }
 
     protected void printListProducts(HttpServletResponse response, String sql, String header) {
-        formResponse(response, sql, (r, writer, rs) -> {
+        formResponse(response, sql, (writer, rs) -> {
             writer.println("<h1>" + header + "</h1>");
             listProducts(rs, writer);
         });
     }
 
     protected void printNumber(HttpServletResponse response, String sql, String header) {
-        formResponse(response, sql, (r, writer, rs) -> {
+        formResponse(response, sql, (writer, rs) -> {
             writer.println("<h1>" + header + "</h1>");
             if (rs.next()) {
                 writer.println(rs.getInt(1));
@@ -55,6 +55,6 @@ public abstract class BaseServlet extends HttpServlet {
     }
 
     protected interface ResponseFormer {
-        void form(HttpServletResponse response, PrintWriter writer, ResultSet rs) throws SQLException, IOException;
+        void form(PrintWriter writer, ResultSet rs) throws SQLException, IOException;
     }
 }

@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServlet;
  */
 public class Main {
 
+    public static final String DB_PATH = "jdbc:sqlite:test.db";
+
     private static void addServlet(ServletContextHandler context, HttpServlet servlet, String path) {
         context.addServlet(new ServletHolder(servlet), "/" + path);
     }
@@ -25,7 +27,7 @@ public class Main {
         context.setContextPath("/");
         server.setHandler(context);
 
-        DbDriver db = new DbDriver("jdbc:sqlite:test.db");
+        DbDriver db = new DbDriver(DB_PATH);
 
         addServlet(context, new AddProductServlet(db), "add-product");
         addServlet(context, new GetProductsServlet(db), "get-products");
