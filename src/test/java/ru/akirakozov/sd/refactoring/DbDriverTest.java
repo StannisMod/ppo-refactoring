@@ -1,8 +1,10 @@
 package ru.akirakozov.sd.refactoring;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -31,6 +33,16 @@ public class DbDriverTest {
     @BeforeEach
     public void prepareDB() {
         prepareTestDB();
+    }
+
+    @AfterAll
+    public static void clearDB() {
+        String pathToDB;
+        {
+            String[] parts = Main.DB_PATH.split(":");
+            pathToDB = parts[parts.length - 1];
+        }
+        new File(pathToDB).delete();
     }
 
     @Test

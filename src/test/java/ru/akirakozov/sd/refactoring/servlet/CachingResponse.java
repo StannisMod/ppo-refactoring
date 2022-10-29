@@ -25,6 +25,14 @@ public final class CachingResponse implements HttpServletResponse {
         assert contents.toString().replaceAll("[\n\r]", "").equals(expected);
     }
 
+    public void assertContains(String expected) {
+        assert contents.toString().replaceAll("[\n\r]", "").contains(expected);
+    }
+
+    public void assertStatus(int status) {
+        assert getStatus() == status;
+    }
+
     @Override
     public void addCookie(final Cookie cookie) {
 
