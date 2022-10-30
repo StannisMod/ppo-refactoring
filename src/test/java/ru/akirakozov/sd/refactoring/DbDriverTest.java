@@ -1,49 +1,12 @@
 package ru.akirakozov.sd.refactoring;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DbDriverTest {
-
-    public static void prepareTestDB() {
-        try (Connection c = DriverManager.getConnection(Main.DB_PATH);
-             Statement stmt = c.createStatement()) {
-            stmt.executeUpdate("DROP TABLE IF EXISTS PRODUCT;");
-            stmt.executeUpdate("CREATE TABLE PRODUCT (" +
-                    "name VARCHAR(50), " +
-                    "price INT" +
-                    ");");
-            stmt.executeUpdate("INSERT INTO PRODUCT (name, price) VALUES " +
-                    "('apple', 1), ('coffee', 10), ('computer', 100);");
-        } catch (SQLException e) {
-            throw new RuntimeException("Error while creating test DB!!!", e);
-        }
-    }
-
-    @BeforeEach
-    public void prepareDB() {
-        prepareTestDB();
-    }
-
-    @AfterAll
-    public static void clearDB() {
-        String pathToDB;
-        {
-            String[] parts = Main.DB_PATH.split(":");
-            pathToDB = parts[parts.length - 1];
-        }
-        new File(pathToDB).delete();
-    }
+public class DbDriverTest extends DbTest {
 
     @Test
     public void testExecuteGet() {

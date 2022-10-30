@@ -1,27 +1,20 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.akirakozov.sd.refactoring.DbDriver;
-import ru.akirakozov.sd.refactoring.DbDriverTest;
+import ru.akirakozov.sd.refactoring.DbTest;
 import ru.akirakozov.sd.refactoring.Main;
 
-public class BaseServletTest {
+public class BaseServletTest extends DbTest {
 
     private CachingResponse response;
     private BaseServlet servlet;
 
     @BeforeEach
-    public void prepareDB() {
-        DbDriverTest.prepareTestDB();
+    public void prepareServlet() {
         response = new CachingResponse();
         servlet = new BaseServlet(new DbDriver(Main.DB_PATH)) {};
-    }
-
-    @AfterAll
-    public static void clearDB() {
-        DbDriverTest.clearDB();
     }
 
     @Test

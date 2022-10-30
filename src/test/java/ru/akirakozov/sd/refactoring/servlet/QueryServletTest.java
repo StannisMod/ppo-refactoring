@@ -1,66 +1,40 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import ru.akirakozov.sd.refactoring.DbDriver;
-import ru.akirakozov.sd.refactoring.DbDriverTest;
 import ru.akirakozov.sd.refactoring.Main;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Random;
 
 import static org.mockito.Mockito.when;
 
-public class QueryServletTest {
-
-    @Mock
-    private HttpServletRequest request;
-
-    private AutoCloseable mockitoObj;
-
-    private CachingResponse response;
+public class QueryServletTest extends ServletTest {
 
     private QueryServlet servlet;
 
     @BeforeEach
-    public void prepareMocks() {
-        mockitoObj = MockitoAnnotations.openMocks(this);
-        response = new CachingResponse();
+    public void prepareServlet() {
         servlet = new QueryServlet(new DbDriver(Main.DB_PATH));
-        DbDriverTest.prepareTestDB();
-    }
-
-    @AfterEach
-    public void closeMocks() throws Exception {
-        mockitoObj.close();
-    }
-
-    @AfterAll
-    public static void clearDB() {
-        DbDriverTest.clearDB();
     }
 
     private void runQueryTest(String command, int status) throws IOException {
-        when(request.getParameter("command")).thenReturn(command);
+        when(getRequest().getParameter("command")).thenReturn(command);
 
-        servlet.doGet(request, response);
+        servlet.doGet(getRequest(), getResponse());
 
-        response.assertStatus(status);
+        getResponse().assertStatus(status);
     }
 
     private void runQueryTest(String command, String expected) throws IOException {
-        when(request.getParameter("command")).thenReturn(command);
+        when(getRequest().getParameter("command")).thenReturn(command);
 
-        servlet.doGet(request, response);
+        servlet.doGet(getRequest(), getResponse());
 
-        response.assertStatus(HttpServletResponse.SC_OK);
-        response.assertContains(expected);
+        getResponse().assertStatus(HttpServletResponse.SC_OK);
+        getResponse().assertContains(expected);
     }
 
     @Test
