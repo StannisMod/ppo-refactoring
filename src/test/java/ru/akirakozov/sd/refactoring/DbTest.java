@@ -10,6 +10,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DbTest {
 
@@ -49,5 +52,23 @@ public class DbTest {
             pathToDB = parts[parts.length - 1];
         }
         new File(pathToDB).delete();
+    }
+
+    protected void assertDbContents(DbDriver driver, String[] names, Integer[] prices) {
+        assertDbContents(driver, "SELECT * FROM Product", names, prices);
+    }
+
+    protected void assertDbContents(DbDriver driver, String query, String[] names, Integer[] prices) {
+        final Set<String> expectedNames = Arrays.stream(names).collect(Collectors.toSet());
+        final Set<Integer> expectedPrices = Arrays.stream(prices).collect(Collectors.toSet());
+        driver.executeGet(query, rs -> {
+            while (rs.next()) {
+                assert expectedNames.remove(rs.getString("name"));
+                assert expectedPrices.remove(rs.getInt("price"));
+            }
+        });
+
+        // test that GET receives four right records
+        assert expectedNames.size() == 0 && expectedPrices.size() == 0;
     }
 }
